@@ -195,8 +195,26 @@ void Lcd_init(Lcd *lcd,
     Lcd_display(lcd);
 }
 
-void Lcd_write(Lcd *lcd, uint8_t ch)
+void Lcd_writeByte(Lcd *lcd, uint8_t ch)
 {
     Lcd_data(lcd, ch);
     lcd->delayUs(50U);
+}
+
+void Lcd_write(Lcd *lcd, const void *str)
+{
+    const uint8_t *s = (const uint8_t *)str;
+    while(*s != 0U)
+    {
+        Lcd_writeByte(lcd, *s++);
+    }
+}
+
+void Lcd_writeBuff(Lcd *lcd, const void *buff, uint16_t length)
+{
+    const uint8_t *b = (const uint8_t *)buff;
+    while(length-- != 0)
+    {
+        Lcd_writeByte(lcd, *b++);
+    }
 }
