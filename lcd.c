@@ -50,122 +50,124 @@ enum LcdCmd_t {
     LCD_OTHER
 };
 
-static void Lcd_pinWrite(Lcd *lcd, uint8_t data)
+static uint8_t displayControl = 0U;
+
+static void Lcd_local_pinWrite(uint8_t data)
 {
     /* D4-D7 */
-    lcd->pinWrite(0U, (data & displayD4) != 0U);
-    lcd->pinWrite(1U, (data & displayD5) != 0U);
-    lcd->pinWrite(2U, (data & displayD6) != 0U);
-    lcd->pinWrite(3U, (data & displayD7) != 0U);
+    Lcd_pinWrite(0U, (data & displayD4) != 0U);
+    Lcd_pinWrite(1U, (data & displayD5) != 0U);
+    Lcd_pinWrite(2U, (data & displayD6) != 0U);
+    Lcd_pinWrite(3U, (data & displayD7) != 0U);
 }
 
-static void Lcd_setRs(Lcd *lcd, uint8_t value)
+static void Lcd_setRs(uint8_t value)
 {
-    lcd->pinWrite(5U, value);
+    Lcd_pinWrite(5U, value);
 }
 
-static void Lcd_setEn(Lcd *lcd, uint8_t value)
+static void Lcd_setEn(uint8_t value)
 {
-    lcd->pinWrite(4U, value);
+    Lcd_pinWrite(4U, value);
 }
 
-static void Lcd_clockEn(Lcd *lcd)
+static void Lcd_clockEn(void)
 {
-    Lcd_setEn(lcd, 0U);
-    Lcd_setEn(lcd, 1U);
+    Lcd_setEn(0U);
+    Lcd_setEn(1U);
 }
 
-static void Lcd_command4bit(Lcd *lcd, uint8_t cmd)
+static void Lcd_command4bit(uint8_t cmd)
 {
-    lcd->delayUs(DELAY_WAIT);
+    Lcd_delayUs(DELAY_WAIT);
 
-    Lcd_setRs(lcd, 0U);
+    Lcd_setRs(0U);
 
-    Lcd_pinWrite(lcd, cmd & 0x0FU);
-    Lcd_clockEn(lcd);
+    Lcd_local_pinWrite(cmd & 0x0FU);
+    Lcd_clockEn();
 }
 
-void Lcd_command(Lcd *lcd, uint8_t cmd)
+void Lcd_command(uint8_t cmd)
 {
-    lcd->delayUs(DELAY_WAIT);
+    Lcd_delayUs(DELAY_WAIT);
 
-    Lcd_setRs(lcd, 0U);
+    Lcd_setRs(0U);
 
-    Lcd_pinWrite(lcd, (cmd >> 4U) & 0x0FU);
-    Lcd_clockEn(lcd);
+    Lcd_local_pinWrite((cmd >> 4U) & 0x0FU);
+    Lcd_clockEn();
 
-    Lcd_pinWrite(lcd, cmd & 0x0FU);
-    Lcd_clockEn(lcd);
+    Lcd_local_pinWrite(cmd & 0x0FU);
+    Lcd_clockEn();
 }
 
-void Lcd_data(Lcd *lcd, uint8_t dat)
+void Lcd_data(uint8_t dat)
 {
-    lcd->delayUs(DELAY_WAIT);
+    Lcd_delayUs(DELAY_WAIT);
 
-    Lcd_setRs(lcd, 1U);
+    Lcd_setRs(1U);
 
-    Lcd_pinWrite(lcd, (dat >> 4U) & 0x0FU);
-    Lcd_clockEn(lcd);
+    Lcd_local_pinWrite((dat >> 4U) & 0x0FU);
+    Lcd_clockEn();
 
-    Lcd_pinWrite(lcd, dat & 0x0FU);
-    Lcd_clockEn(lcd);
+    Lcd_local_pinWrite(dat & 0x0FU);
+    Lcd_clockEn();
 }
 
-void Lcd_clear(Lcd *lcd)
+void Lcd_clear(void)
 {
-    Lcd_command(lcd, LCD_CLEAR);
-    lcd->delayUs(DELAY_1U64);
+    Lcd_command(LCD_CLEAR);
+    Lcd_delayUs(DELAY_1U64);
 }
 
-void Lcd_home(Lcd *lcd)
+void Lcd_home(void)
 {
-    Lcd_command(lcd, LCD_HOME);
-    lcd->delayUs(DELAY_1U64);
+    Lcd_command(LCD_HOME);
+    Lcd_delayUs(DELAY_1U64);
 }
 
-void Lcd_display(Lcd *lcd)
+void Lcd_display(void)
 {
-    lcd->displayControl |= LCD_DISPLAY_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl |= LCD_DISPLAY_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_noDisplay(Lcd *lcd)
+void Lcd_noDisplay(void)
 {
-    lcd->displayControl &= ~LCD_DISPLAY_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl &= ~LCD_DISPLAY_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_cursor(Lcd *lcd)
+void Lcd_cursor(void)
 {
-    lcd->displayControl |= LCD_CURSOR_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl |= LCD_CURSOR_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_noCursor(Lcd *lcd)
+void Lcd_noCursor(void)
 {
-    lcd->displayControl &= ~LCD_CURSOR_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl &= ~LCD_CURSOR_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_blink(Lcd *lcd)
+void Lcd_blink(void)
 {
-    lcd->displayControl |= LCD_BLINK_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl |= LCD_BLINK_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_noBlink(Lcd *lcd)
+void Lcd_noBlink(void)
 {
-    lcd->displayControl &= ~LCD_BLINK_ON;
-    Lcd_command(lcd, lcd->displayControl);
-    lcd->delayUs(DELAY_0U40);
+    displayControl &= ~LCD_BLINK_ON;
+    Lcd_command(displayControl);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column)
+void Lcd_setCursor(uint8_t line, uint8_t column)
 {
     uint8_t addr = column;
     switch(line)
@@ -185,64 +187,60 @@ void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column)
         default:
             addr += LCD_LINE0;
     }
-    Lcd_command(lcd, addr);
-    lcd->delayUs(DELAY_0U40);
+    Lcd_command(addr);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_init(Lcd *lcd,
-        void (*funcPinWrite)(uint8_t pin, uint8_t value),
-        void (*funcDelayUs)(uint32_t delay_us))
+void Lcd_init(void)
 {
-    lcd->pinWrite = funcPinWrite;
-    lcd->delayUs = funcDelayUs;
-    lcd->displayControl = LCD_DISPLAY_CONTROL;
+    displayControl = LCD_DISPLAY_CONTROL;
 
     /* Reset sequence */
-    Lcd_setRs(lcd, 1U);
-    Lcd_pinWrite(lcd, 0x0FU);
-    Lcd_setEn(lcd, 1U);
+    Lcd_setRs(1U);
+    Lcd_local_pinWrite(0x0FU);
+    Lcd_setEn(1U);
 
-    lcd->delayUs(DELAY_INIT + 15000U);
+    Lcd_delayUs(DELAY_INIT + 15000U);
 
-    Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(DELAY_INIT + 4100U);
+    Lcd_command4bit(0x03U);
+    Lcd_delayUs(DELAY_INIT + 4100U);
 
-    Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(DELAY_INIT + 100U);
+    Lcd_command4bit(0x03U);
+    Lcd_delayUs(DELAY_INIT + 100U);
 
-    Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(DELAY_INIT + 4100U);
+    Lcd_command4bit(0x03U);
+    Lcd_delayUs(DELAY_INIT + 4100U);
 
-    Lcd_command4bit(lcd, 0x02U);
-    lcd->delayUs(DELAY_0U40);
+    Lcd_command4bit(0x02U);
+    Lcd_delayUs(DELAY_0U40);
 
-    Lcd_command(lcd, 0x28U); /* Config 4 bits, 2 lines, 5x7 font. */
+    Lcd_command(0x28U); /* Config 4 bits, 2 lines, 5x7 font. */
 
-    Lcd_noDisplay(lcd);
-    Lcd_clear(lcd);
-    Lcd_display(lcd);
+    Lcd_noDisplay();
+    Lcd_clear();
+    Lcd_display();
 }
 
-void Lcd_writeByte(Lcd *lcd, uint8_t ch)
+void Lcd_writeByte(uint8_t ch)
 {
-    Lcd_data(lcd, ch);
-    lcd->delayUs(DELAY_0U40);
+    Lcd_data(ch);
+    Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_write(Lcd *lcd, const void *str)
+void Lcd_write(const void *str)
 {
     const uint8_t *s = (const uint8_t *)str;
     while(*s != 0U)
     {
-        Lcd_writeByte(lcd, *s++);
+        Lcd_writeByte(*s++);
     }
 }
 
-void Lcd_writeBuff(Lcd *lcd, const void *buff, uint16_t length)
+void Lcd_writeBuff(const void *buff, uint16_t length)
 {
     const uint8_t *b = (const uint8_t *)buff;
     while(length-- != 0)
     {
-        Lcd_writeByte(lcd, *b++);
+        Lcd_writeByte(*b++);
     }
 }

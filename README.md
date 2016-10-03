@@ -35,8 +35,6 @@ The example shows an implementation using
 #include "Arduinutil.h"
 #include "lcd.h"
 
-Lcd lcd;
-
 /* Converts LCxD pins to the Arduino pins and write value to LCD pins.
 
   Param  LCD  Convert  Arduino
@@ -48,18 +46,17 @@ Lcd lcd;
       4  E      ->     D8
       5  RS     ->     D9
 */
-void displayPinsWrite(uint8_t pin, uint8_t value)
+void Lcd_pinWrite(uint8_t pin, uint8_t value)
 {
     pin += 4; /* Convert. Just sum 4. */
 
-    /* Write. */
+    /* Write pin. */
     pinMode(pin, OUTPUT);
     digitalWrite(pin, value);
 }
 
-/* Delay if needed. If busy waiting is not a concert you can just call
- delayMicroseconds(). */
-void displayDelayUs(uint32_t delay_us)
+/* Delay if needed. */
+void Lcd_delayUs(uint32_t delay_us)
 {
     static uint32_t block_until = 0;
 
@@ -81,9 +78,9 @@ int main(void)
     init();
     timerBegin();
 
-    Lcd_init(&lcd, &displayPinsWrite, &displayDelayUs);
-    Lcd_blink(&lcd);
-    Lcd_write(&lcd, "LCxD");
+    Lcd_init();
+    Lcd_blink();
+    Lcd_write("LCxD");
 
     for(;;) {}
 }
