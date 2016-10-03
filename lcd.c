@@ -46,6 +46,8 @@ enum LcdCmd_t {
 
     LCD_LINE0 = 0x80U,
     LCD_LINE1 = 0xC0U,
+    LCD_LINE2 = 0x94U,
+    LCD_LINE3 = 0xD4U,
 
     LCD_OTHER
 };
@@ -162,10 +164,23 @@ void Lcd_noBlink(Lcd *lcd)
 void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column)
 {
     uint8_t addr = column;
-    if(line == 0U)
-        addr |= LCD_LINE0;
-    else
-        addr |= LCD_LINE1;
+    switch(line)
+    {
+        case 0U:
+            addr += LCD_LINE0;
+            break;
+        case 1U:
+            addr += LCD_LINE1;
+            break;
+        case 2U:
+            addr += LCD_LINE2;
+            break;
+        case 3U:
+            addr += LCD_LINE3;
+            break;
+        default:
+            addr += LCD_LINE0;
+    }
     Lcd_command(lcd, addr);
     lcd->delayUs(DELAY_0U40);
 }
