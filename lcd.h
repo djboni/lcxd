@@ -24,31 +24,31 @@ extern "C" {
 #endif
 
 typedef struct displayLcd_t {
-     (*pinWrite)(uint8_t pin, uint8_t value);
-     (*delayUs)(uint32_t delay_us);
+    void (*pinWrite)(uint8_t pin, uint8_t value);
+    void (*delayUs)(uint32_t delay_us);
 } Lcd;
 
- Lcd_init(Lcd *lcd,
-         (*funcPinWrite)(uint8_t pin, uint8_t value),
-         (*funcDelayUs)(uint32_t delay_us));
+void Lcd_init(Lcd *lcd,
+        void (*funcPinWrite)(uint8_t pin, uint8_t value),
+        void (*funcDelayUs)(uint32_t delay_us));
 
- Lcd_writeByte(Lcd *lcd, uint8_t data);
- Lcd_write(Lcd *lcd, const  *str);
- Lcd_writeBuff(Lcd *lcd, const  *buff, uint16_t length);
+void Lcd_writeByte(Lcd *lcd, uint8_t data);
+void Lcd_write(Lcd *lcd, const void *str);
+void Lcd_writeBuff(Lcd *lcd, const void *buff, uint16_t length);
 
- Lcd_clear(Lcd *lcd);
- Lcd_home(Lcd *lcd);
- Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column);
+void Lcd_clear(Lcd *lcd);
+void Lcd_home(Lcd *lcd);
+void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column);
 
- Lcd_display(Lcd *lcd);
- Lcd_noDisplay(Lcd *lcd);
- Lcd_cursor(Lcd *lcd);
- Lcd_noCursor(Lcd *lcd);
- Lcd_blink(Lcd *lcd);
- Lcd_noBlink(Lcd *lcd);
+void Lcd_display(Lcd *lcd);
+void Lcd_noDisplay(Lcd *lcd);
+void Lcd_cursor(Lcd *lcd);
+void Lcd_noCursor(Lcd *lcd);
+void Lcd_blink(Lcd *lcd);
+void Lcd_noBlink(Lcd *lcd);
 
- Lcd_command(Lcd *lcd, uint8_t cmd);
- Lcd_data(Lcd *lcd, uint8_t dat);
+void Lcd_command(Lcd *lcd, uint8_t cmd);
+void Lcd_data(Lcd *lcd, uint8_t dat);
 
 #ifdef __cplusplus
 } /* extern "C" */

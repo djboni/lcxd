@@ -17,6 +17,11 @@
 #include "lcd.h"
 #include <stdint.h>
 
+#define DELAY_1U64 1640U
+#define DELAY_0U40 40U
+#define DELAY_WAIT 0U
+#define DELAY_INIT 0U
+
 enum LcdPins_t {
     displayD4 = 1U,
     displayD5 = 2U,
@@ -72,81 +77,86 @@ static void Lcd_clockEn(Lcd *lcd)
 
 static void Lcd_command4bit(Lcd *lcd, uint8_t cmd)
 {
-    Lcd_setRs(lcd, 0U);
-    Lcd_pinWrite(lcd, cmd & 0x0FU);
+    lcd->delayUs(DELAY_WAIT);
 
-    lcd->delayUs(0U);
+    Lcd_setRs(lcd, 0U);
+
+    Lcd_pinWrite(lcd, cmd & 0x0FU);
     Lcd_clockEn(lcd);
 }
 
 void Lcd_command(Lcd *lcd, uint8_t cmd)
 {
+    lcd->delayUs(DELAY_WAIT);
+
     Lcd_setRs(lcd, 0U);
+
     Lcd_pinWrite(lcd, (cmd >> 4U) & 0x0FU);
     Lcd_clockEn(lcd);
-    Lcd_pinWrite(lcd, cmd & 0x0FU);
 
-    lcd->delayUs(0U);
+    Lcd_pinWrite(lcd, cmd & 0x0FU);
     Lcd_clockEn(lcd);
 }
 
 void Lcd_data(Lcd *lcd, uint8_t dat)
 {
+    lcd->delayUs(DELAY_WAIT);
+
     Lcd_setRs(lcd, 1U);
+
     Lcd_pinWrite(lcd, (dat >> 4U) & 0x0FU);
     Lcd_clockEn(lcd);
-    Lcd_pinWrite(lcd, dat & 0x0FU);
 
-    lcd->delayUs(0U);
+    Lcd_pinWrite(lcd, dat & 0x0FU);
     Lcd_clockEn(lcd);
 }
 
 void Lcd_clear(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_CLEAR);
-    lcd->delayUs(2000U);
+    lcd->delayUs(DELAY_1U64);
 }
 
 void Lcd_home(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_HOME);
-    lcd->delayUs(2000U);
+    lcd->delayUs(DELAY_1U64);
 }
 
 void Lcd_display(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_DISPLAY_ON);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noDisplay(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_DISPLAY_OFF);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_cursor(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_CURSOR_ON);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noCursor(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_CURSOR_OFF);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_blink(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_BLINK_ON);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noBlink(Lcd *lcd)
 {
     Lcd_command(lcd, LCD_BLINK_OFF);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column)
@@ -157,7 +167,7 @@ void Lcd_setCursor(Lcd *lcd, uint8_t line, uint8_t column)
     else
         addr |= LCD_LINE1;
     Lcd_command(lcd, addr);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_init(Lcd *lcd,
@@ -172,21 +182,19 @@ void Lcd_init(Lcd *lcd,
     Lcd_pinWrite(lcd, 0x0FU);
     Lcd_setEn(lcd, 1U);
 
-    /* Delay and wait. */
-    lcd->delayUs(20000U);
-    lcd->delayUs(0U);
+    lcd->delayUs(DELAY_INIT + 15000U);
 
     Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(20000U);
+    lcd->delayUs(DELAY_INIT + 4100U);
 
     Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(20000U);
+    lcd->delayUs(DELAY_INIT + 100U);
 
     Lcd_command4bit(lcd, 0x03U);
-    lcd->delayUs(20000U);
+    lcd->delayUs(DELAY_INIT + 4100U);
 
     Lcd_command4bit(lcd, 0x02U);
-    lcd->delayUs(20000U);
+    lcd->delayUs(DELAY_0U40);
 
     Lcd_command(lcd, 0x28U); /* Config 4 bits, 2 lines, 5x7 font. */
 
@@ -198,7 +206,7 @@ void Lcd_init(Lcd *lcd,
 void Lcd_writeByte(Lcd *lcd, uint8_t ch)
 {
     Lcd_data(lcd, ch);
-    lcd->delayUs(50U);
+    lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_write(Lcd *lcd, const void *str)
