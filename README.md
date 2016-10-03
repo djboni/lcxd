@@ -1,6 +1,7 @@
-# LCxD
+# [LCxD](https://github.com/djboni/lcxd)
 
 by [Djones A. Boni](https://twitter.com/djonesboni)
+
 
 Flexible 4-bit LCD library.
 
@@ -27,7 +28,8 @@ See the doc/LICENSE file for details.
 
 To use LCxD you need a pin write functions and a delay function.
 
-The example shows an implementation.
+The example shows an implementation using
+[Arduinutil](https://github.com/djboni/arduinutil) as development platform.
 
 ```c
 #include "Arduinutil.h"
@@ -88,11 +90,17 @@ int main(void)
 ```
 
 
+## Contributing to LCxD
+
+If you have suggestions for improving LCxD, please
+[open an issue or pull request on GitHub](https://github.com/djboni/lcxd).
+
+
 
 ## Important files
 
-README.md
+[README.md](https://github.com/djboni/lcxd/blob/master/README.md)
 Fast introduction (this file).
 
-doc/LICENCE
+[doc/LICENCE](https://github.com/djboni/lcxd/blob/master/doc/LICENSE)
 Complete license text.
