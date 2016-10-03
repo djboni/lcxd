@@ -26,6 +26,7 @@ extern "C" {
 typedef struct displayLcd_t {
     void (*pinWrite)(uint8_t pin, uint8_t value);
     void (*delayUs)(uint32_t delay_us);
+    uint8_t displayControl;
 } Lcd;
 
 void Lcd_init(Lcd *lcd,

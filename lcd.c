@@ -37,12 +37,10 @@ enum LcdCmd_t {
 
     LCD_HOME = 0x02U,
 
-    LCD_DISPLAY_OFF = 0x08U,
-    LCD_DISPLAY_ON = 0x0CU,
-    LCD_CURSOR_ON = 0x0EU,
-    LCD_BLINK_ON = 0x0DU,
-    LCD_CURSOR_OFF = LCD_DISPLAY_ON,
-    LCD_BLINK_OFF = LCD_DISPLAY_ON,
+    LCD_DISPLAY_CONTROL = 0x08U,
+    LCD_DISPLAY_ON = 0x04U,
+    LCD_CURSOR_ON = 0x02U,
+    LCD_BLINK_ON = 0x01U,
 
     LCD_LINE0 = 0x80U,
     LCD_LINE1 = 0xC0U,
@@ -127,37 +125,43 @@ void Lcd_home(Lcd *lcd)
 
 void Lcd_display(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_DISPLAY_ON);
+    lcd->displayControl |= LCD_DISPLAY_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noDisplay(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_DISPLAY_OFF);
+    lcd->displayControl &= ~LCD_DISPLAY_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_cursor(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_CURSOR_ON);
+    lcd->displayControl |= LCD_CURSOR_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noCursor(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_CURSOR_OFF);
+    lcd->displayControl &= ~LCD_CURSOR_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_blink(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_BLINK_ON);
+    lcd->displayControl |= LCD_BLINK_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
 void Lcd_noBlink(Lcd *lcd)
 {
-    Lcd_command(lcd, LCD_BLINK_OFF);
+    lcd->displayControl &= ~LCD_BLINK_ON;
+    Lcd_command(lcd, lcd->displayControl);
     lcd->delayUs(DELAY_0U40);
 }
 
@@ -191,6 +195,7 @@ void Lcd_init(Lcd *lcd,
 {
     lcd->pinWrite = funcPinWrite;
     lcd->delayUs = funcDelayUs;
+    lcd->displayControl = LCD_DISPLAY_CONTROL;
 
     /* Reset sequence */
     Lcd_setRs(lcd, 1U);
