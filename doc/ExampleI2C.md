@@ -11,13 +11,12 @@ The example shows an implementation using
 #include "Arduinutil.h"
 #include "lcd.h"
 
-void Lcd_8574write(uint8_t val)
+void Lcd_8574write(const uint8_t *buff, uint8_t length)
 {
     const uint8_t addr = 0x27;
-    const uint8_t length = 1;
     uint8_t num;
 
-    I2c_write(addr, &val, length, &num);
+    I2c_write(addr, buff, length, &num);
     while(I2c_getStatus() != 0) {}
     if(num != length)
     {
@@ -42,6 +41,7 @@ void Lcd_8574write(uint8_t val)
 void Lcd_pinWrite(uint8_t pin, uint8_t value)
 {
     static uint8_t pins = 0xFD; /* D7-4=1, LED=1, E=1, RW=0, RW=1 */
+    uint8_t buff[2];
 
     switch(pin) {
         case 0: /* D4 */
@@ -66,18 +66,27 @@ void Lcd_pinWrite(uint8_t pin, uint8_t value)
             ASSERT(0); /* Invalid pin. */
     }
 
-    /* Write data before changing E. */
-    if(pin == 2)
-        Lcd_8574write(pins);
-
     if(value == 0)
+    {
+        /* Possible E falling edge. Data is read by the LCD in this edge. First
+         send data with high E and then send data with low E. */
+        buff[0] = pins;
         pins &= ~(1 << pin);
-    else
-        pins |= (1 << pin);
+        buff[1] = pins;
 
-    /* Now write data after changing E. */
-    if(pin == 2)
-        Lcd_8574write(pins);
+        if(pin == 2)
+            Lcd_8574write(buff, 2);
+    }
+    else
+    {
+        /* Possible E rising edge. Data is not read by the LCD in this edge.
+         Just send the data with high E. */
+        pins |= (1 << pin);
+        buff[0] = pins;
+
+        if(pin == 2)
+            Lcd_8574write(buff, 1);
+    }
 }
 
 void Lcd_delayUs(uint32_t delay_us)
