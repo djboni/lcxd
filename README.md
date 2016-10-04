@@ -45,6 +45,7 @@ The example shows an implementation using
       3  D7     ->     D7
       4  E      ->     D8
       5  RS     ->     D9
+      -  RW     ->     GND
 */
 void Lcd_pinWrite(uint8_t pin, uint8_t value)
 {
@@ -78,7 +79,7 @@ int main(void)
     init();
     timerBegin();
 
-    Lcd_init();
+    Lcd_init(2, 16); /* LCD 1602 */
     Lcd_blink();
     Lcd_write("LCxD");
 

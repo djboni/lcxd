@@ -26,7 +26,7 @@ extern "C" {
 void Lcd_pinWrite(uint8_t pin, uint8_t value);
 void Lcd_delayUs(uint32_t delay_us);
 
-void Lcd_init(void);
+void Lcd_init(uint8_t lines, uint8_t columns);
 
 void Lcd_writeByte(uint8_t data);
 void Lcd_write(const void *str);

@@ -44,13 +44,12 @@ enum LcdCmd_t {
 
     LCD_LINE0 = 0x80U,
     LCD_LINE1 = 0xC0U,
-    LCD_LINE2 = 0x94U,
-    LCD_LINE3 = 0xD4U,
 
     LCD_OTHER
 };
 
 static uint8_t displayControl = 0U;
+static uint8_t displayColumns = 0U;
 
 static void Lcd_local_pinWrite(uint8_t data)
 {
@@ -179,10 +178,10 @@ void Lcd_setCursor(uint8_t line, uint8_t column)
             addr += LCD_LINE1;
             break;
         case 2U:
-            addr += LCD_LINE2;
+            addr += LCD_LINE0 + displayColumns;
             break;
         case 3U:
-            addr += LCD_LINE3;
+            addr += LCD_LINE1 + displayColumns;
             break;
         default:
             addr += LCD_LINE0;
@@ -191,9 +190,11 @@ void Lcd_setCursor(uint8_t line, uint8_t column)
     Lcd_delayUs(DELAY_0U40);
 }
 
-void Lcd_init(void)
+void Lcd_init(uint8_t lines, uint8_t columns)
 {
     displayControl = LCD_DISPLAY_CONTROL;
+    displayColumns = columns;
+    (void) lines;
 
     /* Reset sequence */
     Lcd_setRs(1U);
