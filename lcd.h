@@ -31,6 +31,7 @@ void Lcd_init(uint8_t lines, uint8_t columns);
 void Lcd_writeByte(uint8_t data);
 void Lcd_write(const void *str);
 void Lcd_writeBuff(const void *buff, uint16_t length);
+int Lcd_print(const char *format, ...);
 
 void Lcd_clear(void);
 void Lcd_home(void);
@@ -45,6 +46,10 @@ void Lcd_noBlink(void);
 
 void Lcd_command(uint8_t cmd);
 void Lcd_data(uint8_t dat);
+
+#ifndef LCXD_PRINT_BUFSZ
+#define LCXD_PRINT_BUFSZ 20U
+#endif
 
 #ifdef __cplusplus
 } /* extern "C" */

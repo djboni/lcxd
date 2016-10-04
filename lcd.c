@@ -16,6 +16,8 @@
 
 #include "lcd.h"
 #include <stdint.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #define DELAY_1U64 1640U
 #define DELAY_0U40 40U
@@ -244,4 +246,18 @@ void Lcd_writeBuff(const void *buff, uint16_t length)
     {
         Lcd_writeByte(*b++);
     }
+}
+
+int Lcd_print(const char *format, ...)
+{
+    int used_length;
+    char buf[LCXD_PRINT_BUFSZ];
+    {
+        va_list vl;
+        va_start(vl, format);
+        used_length = vsnprintf(buf, sizeof(buf), format, vl);
+        va_end(vl);
+    }
+    Lcd_write(buf);
+    return used_length;
 }
