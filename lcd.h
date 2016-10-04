@@ -48,7 +48,7 @@ void Lcd_command(uint8_t cmd);
 void Lcd_data(uint8_t dat);
 
 #ifndef LCXD_PRINT_BUFSZ
-#define LCXD_PRINT_BUFSZ 20U
+#define LCXD_PRINT_BUFSZ 21U
 #endif
 
 #ifdef __cplusplus
