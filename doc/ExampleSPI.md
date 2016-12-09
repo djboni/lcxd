@@ -14,12 +14,11 @@ The example shows an implementation using
 void Lcd_595write(const uint8_t *buff, uint8_t length)
 {
     const uint8_t ss_pin = 10;
-    uint8_t num;
-
+	
     pinMode(ss_pin, OUTPUT);
     digitalWrite(ss_pin, LOW);
 
-    Spi_write(buff, length);
+    Spi_transmit(buff, length);
     while(Spi_getStatus() != 0) {}
 
     digitalWrite(ss_pin, HIGH);
@@ -43,7 +42,8 @@ pins when E/LCD_VCC is changed.
 void Lcd_pinWrite(uint8_t pin, uint8_t value)
 {
     static uint8_t pins = 0xFF; /* LED=1, D4-7=1, E=1, RS=1, LCD_VCC=1 */
-    uint8_t buff[2];
+    uint8_t oldPins;
+    uint8_t mustTransfer = 0;
 
     switch(pin) {
         case 0: /* D4 */
@@ -60,41 +60,40 @@ void Lcd_pinWrite(uint8_t pin, uint8_t value)
             break;
         case 4: /* E */
             pin = 2;
+            mustTransfer = 1;
             break;
         case 5: /* RS */
             pin = 1;
             break;
         case 7: /* LED */
             pin = 7;
+            mustTransfer = 1;
             break;
         case 8: /* LCD_VCC */
             pin = 0;
+            mustTransfer = 1;
             break;
         default:
             ASSERT(0); /* Invalid pin. */
     }
 
+    oldPins = pins;
     if(value == 0)
     {
-        /* Possible E/LCD_VCC falling edge. Data is read by the LCD in this
-         edge. First send data with high E/LCD_VCC and then send data with low
-         E/LCD_VCC. */
-        buff[0] = pins;
         pins &= ~(1 << pin);
-        buff[1] = pins;
-
-        if(pin == 2 || pin == 8)
-            Lcd_595write(buff, 2);
     }
     else
     {
-        /* Possible E/LCD_VCC rising edge. Data is not read by the LCD in this
-        edge. Just send the data with high E/LCD_VCC. */
         pins |= (1 << pin);
-        buff[0] = pins;
-
-        if(pin == 2 || pin == 8)
-            Lcd_595write(buff, 1);
+    }
+    if(mustTransfer)
+    {
+        if(value == 0 && (pin == 1 || pin == 2))
+        {
+            /* Falling edge of E or RS. */
+            Lcd_595write(&oldPins, 1);
+        }
+        Lcd_595write(&pins, 1);
     }
 }
 
