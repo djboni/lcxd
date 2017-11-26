@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-void Lcd_pinWrite(uint8_t pin, uint8_t value);
+void Lcd_pinsWrite(uint8_t data_00ER7654);
 void Lcd_delayUs(uint32_t delay_us);
 
 void Lcd_init(uint8_t lines, uint8_t columns);

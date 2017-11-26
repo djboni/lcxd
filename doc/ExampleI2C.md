@@ -24,69 +24,38 @@ void Lcd_8574write(const uint8_t *buff, uint8_t length)
     }
 }
 
+/* LCD pin data. */
+uint8_t lcd_pins = 0xFD; /* D7-4=1, LED=1, E=1, RW=0, RS=1 */
+
 /* Converts LCxD pins to the I2C expander pins and write the values to LCD pins
  when E is changed.
 
   Param  LCD  Convert  PCF8574
     pin  pin    to     pin
-      0  D4     ->     P4
-      1  D5     ->     P5
-      2  D6     ->     P6
-      3  D7     ->     P7
+      0  DB4    ->     P4
+      1  DB5    ->     P5
+      2  DB6    ->     P6
+      3  DB7    ->     P7
       4  E      ->     P2
       5  RS     ->     P0
       6  RW     ->     P1  (not used in LCxD)
       7  LED    ->     P3  (not used in LCxD)
 */
-void Lcd_pinWrite(uint8_t pin, uint8_t value)
+void Lcd_pinsWrite(uint8_t data_00ER7654)
 {
-    static uint8_t pins = 0xFD; /* D7-4=1, LED=1, E=1, RW=0, RW=1 */
-    uint8_t buff[2];
+    uint8_t data;
+    CRITICAL_VAL();
 
-    switch(pin) {
-        case 0: /* D4 */
-        case 1: /* D5 */
-        case 2: /* D6 */
-        case 3: /* D7 */
-            pin += 4;
-            break;
-        case 4: /* E */
-            pin = 2;
-            break;
-        case 5: /* RS */
-            pin = 0;
-            break;
-        case 6: /* RW */
-            pin = 1;
-            break;
-        case 7: /* LED */
-            pin = 3;
-            break;
-        default:
-            ASSERT(0); /* Invalid pin. */
-    }
+    /* Reorder bits: DB7-DB4, E, RS */
+    data = (data_00ER7654 << 4) | ((data_00ER7654 >> 2) & 0x04)
+        | ((data_00ER7654 >> 4) & 0x01);
 
-    if(value == 0)
-    {
-        /* Possible E falling edge. Data is read by the LCD in this edge. First
-         send data with high E and then send data with low E. */
-        buff[0] = pins;
-        pins &= ~(1 << pin);
-        buff[1] = pins;
-
-        if(pin == 2)
-            Lcd_8574write(buff, 2);
-    }
-    else
-    {
-        /* Possible E rising edge. Data is not read by the LCD in this edge.
-         Just send the data with high E. */
-        pins |= (1 << pin);
-        buff[0] = pins;
-
-        if(pin == 2)
-            Lcd_8574write(buff, 1);
-    }
+    CRITICAL_ENTER();
+    data = (lcd_pins & 0x0A) | (data & 0xF5);
+    lcd_pins = data;
+    CRITICAL_EXIT();
+    
+    Lcd_8574write(&data, 1);
 }
 
 void Lcd_delayUs(uint32_t delay_us)
