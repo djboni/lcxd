@@ -9,10 +9,9 @@ LCxD is flexible because it is not aware of the LCD interface, which could
 be IO pins, SPI shift register, I2C IO expander... The user defines the pin
 write function and the delay microsseconds function used by the library.
 
-The pin write function is called with a pin number and the value to be
-written. The pin number corresponds to one of the LCD pins instead of an
-Arduino pin. The function should convert to the correct Arduino pin or other
-interface.
+The pin write function is called with LCxD bits set (=1) or reset (=0).
+The bits numbers correspond to one of the LCD pins.
+The function should convert to the correct Arduino pin or other interface.
 
 You can use LCxD both for closed- and open-source projects. You are also
 free to keep changes to this library to yourself. However we'll enjoy your
@@ -48,6 +47,9 @@ Complete license text.
 
 [doc/ExampleIO.md](https://github.com/djboni/lcxd/blob/master/doc/ExampleIO.md)
 Example using direct IOs.
+
+[doc/ExampleSPI.md](https://github.com/djboni/lcxd/blob/master/doc/ExampleI2C.md)
+Example using 74HC595 SPI shift register.
 
 [doc/ExampleI2C.md](https://github.com/djboni/lcxd/blob/master/doc/ExampleI2C.md)
 Example using PCF8574 I2C expander.
